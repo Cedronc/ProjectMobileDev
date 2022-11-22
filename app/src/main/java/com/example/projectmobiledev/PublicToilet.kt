@@ -17,6 +17,8 @@ class PublicToilet()
     val zipcode: Int = 0
     val targetAudience: String= ""
     val operatingHours: String = ""
+
+
     companion object {
         fun decodeJson(json: JsonObject): PublicToilet {
             return Json.decodeFromJsonElement(json)

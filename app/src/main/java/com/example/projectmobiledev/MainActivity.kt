@@ -2,6 +2,7 @@ package com.example.projectmobiledev
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -21,14 +22,17 @@ class MainActivity : AppCompatActivity() {
         val database = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/")
         val myRef = database.getReference("features")
 
+        var toilets: List<PublicToilet>?
+
         myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val value = dataSnapshot.getValue<List<PublicToilet>>()
+                toilets = dataSnapshot.getValue<List<PublicToilet>>()
             }
 
             override fun onCancelled(error: DatabaseError) {
                 // Failed to read value
                 Log.w("Testing", "Failed to read value.", error.toException())
+                Toast.makeText(this@MainActivity, "Failed to connect to database.", Toast.LENGTH_SHORT).show()
             }
         })
 
