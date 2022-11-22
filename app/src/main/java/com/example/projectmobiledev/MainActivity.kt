@@ -1,11 +1,13 @@
 package com.example.projectmobiledev
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
@@ -15,12 +17,15 @@ import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var database: DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val database = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/")
-        val myRef = database.getReference("features")
+        val firebaseDb = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/")
+        val myRef = firebaseDb.getReference("features")
+        database = firebaseDb.reference
 
         var toilets: List<PublicToilet>?
 
@@ -56,10 +61,7 @@ class MainActivity : AppCompatActivity() {
                 response.use {
                     if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-                    for ((name, value) in response.headers) {
-                        Log.d("OUR_APP", response.headers.toString())
-
-                    }
+                    PublicToilet.decodeJson(PublicToilet.getJson(response.body!!.string()))
                 }
             }
         })
