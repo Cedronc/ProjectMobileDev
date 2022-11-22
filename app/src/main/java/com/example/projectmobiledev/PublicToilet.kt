@@ -1,14 +1,29 @@
 package com.example.projectmobiledev
 
-class PublicToilet(
-    id: Number,
-    category: String,
-    description: String,
-    extraDescription: String,
-    paying: String,
-    street: String, houseNr: String, city: String, zipcode: Number,
-    targetAudience: String, operatingHours: String)
+import android.util.Log
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.*
 
+@Serializable
+class PublicToilet()
 {
-
+    val id: Int = 0
+    val category: String = ""
+    val extraDescription: String = ""
+    val paying: String = ""
+    val street: String = ""
+    val houseNr: String = ""
+    val city: String= ""
+    val zipcode: Int = 0
+    val targetAudience: String= ""
+    val operatingHours: String = ""
+    companion object {
+        fun decodeJson(json: JsonObject): PublicToilet {
+            return Json.decodeFromJsonElement(json)
+        }
+        fun getJson(text: String): JsonObject {
+            Log.d("JsonBuilder", Json.parseToJsonElement(text).toString())
+            return Json.parseToJsonElement(text).jsonObject
+        }
+    }
 }

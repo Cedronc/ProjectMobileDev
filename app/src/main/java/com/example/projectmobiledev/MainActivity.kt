@@ -23,8 +23,7 @@ class MainActivity : AppCompatActivity() {
 
         myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val value = dataSnapshot.getValue<PublicToilet>()
-                Log.d("Testing", "Value is: $value")
+                val value = dataSnapshot.getValue<List<PublicToilet>>()
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -54,11 +53,9 @@ class MainActivity : AppCompatActivity() {
                     if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
                     for ((name, value) in response.headers) {
-                        Log.d("OUR_APP", response.body!!.string())
+                        Log.d("OUR_APP", response.headers.toString())
 
                     }
-
-                    Log.d("OUR_APP", response.body!!.string())
                 }
             }
         })
