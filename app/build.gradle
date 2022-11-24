@@ -4,6 +4,7 @@ plugins {
     id 'com.google.gms.google-services'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
     id 'org.jetbrains.kotlin.plugin.serialization'
+
 }
 
 android {
@@ -56,5 +57,9 @@ dependencies {
 
     // OKHttp
     implementation 'com.squareup.okhttp3:okhttp:4.9.1'
+    //OSMDroid
+    implementation 'org.osmdroid:osmdroid-android:6.1.11'
+
+
 
 }

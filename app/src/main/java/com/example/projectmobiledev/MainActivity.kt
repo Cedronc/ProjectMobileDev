@@ -41,6 +41,9 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        val intent = Intent(this, Map::class.java)
+        startActivity(intent)
+
         getToilets() // werkt goed
     }
 
@@ -61,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                 response.use {
                     if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-                    PublicToilet.decodeJson(PublicToilet.getJson(response.body!!.string()))
+                    //PublicToilet.decodeJson(PublicToilet.getJson(response.body!!.string()))
                 }
             }
         })
