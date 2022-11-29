@@ -4,8 +4,12 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.media.VolumeShaper.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.util.Log
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -16,6 +20,14 @@ import org.osmdroid.config.Configuration.*
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.MapView
 import com.google.android.gms.internal.maps.zzaa
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
+import com.google.firebase.ktx.Firebase
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.ItemizedIconOverlay
 import org.osmdroid.views.overlay.ItemizedOverlay
 import org.osmdroid.views.overlay.OverlayItem
@@ -23,11 +35,13 @@ import org.osmdroid.views.overlay.OverlayItem
 import java.util.ArrayList
 
 class Map : AppCompatActivity() {
+
+    private lateinit var database: DatabaseReference
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
     private lateinit var map : MapView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         //handle permissions first, before map is created. not depicted here
 
         //load/initialize the osmdroid configuration, this can be done
@@ -46,6 +60,11 @@ class Map : AppCompatActivity() {
         map = findViewById(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
 
+        //set the zoom level
+        map.controller.setZoom(16.0)
+        //set the center point
+        map.controller.setCenter(GeoPoint(51.219076, 4.414370))
+        getToilets()
     }
 
 
@@ -67,10 +86,13 @@ class Map : AppCompatActivity() {
         map.onPause()  //needed for compass, my location overlays, v6.0.0 and up
     }
 
-    fun setMarkers(toilets: List<PublicToilet>, mapView: zzaa){
+    private fun setMarkers(toilets: List<PublicToilet>?){
         val markers = ArrayList<OverlayItem>()
+        if (toilets == null)
+            return
         for (toilet in toilets){
-            val marker = OverlayItem(toilet.name, toilet.address, toilet.location)
+            Log.d("markers", toilet.LAT.toString() + " " + toilet.LONG.toString())
+            val marker = OverlayItem(toilet.DOELGROEP, toilet.STRAAT, GeoPoint(toilet.LAT, toilet.LONG))
             markers.add(marker)
         }
 
@@ -111,4 +133,24 @@ class Map : AppCompatActivity() {
         }*/
     }
 
+    private fun getToilets(){
+        val firebaseDb = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/")
+        val myRef = firebaseDb.getReference("features/features")
+        database = firebaseDb.reference
+
+        val toilets = ArrayList<PublicToilet>()
+
+        database.child("Toilets").get().addOnCompleteListener {
+            if (it.isSuccessful) {
+                Log.d("Firebase", it.result.toString())
+                it.result.children.forEach { toilet ->
+                    val temp = toilet.getValue(PublicToilet::class.java)
+                    toilets.add(temp!!)
+                }
+                setMarkers(toilets)
+            } else {
+                Log.d("ToiletFinder", it.exception?.message.toString())
+            }
+        }
+    }
 }

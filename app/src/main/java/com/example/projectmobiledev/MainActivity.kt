@@ -14,35 +14,21 @@ import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import okhttp3.*
 import java.io.IOException
+import com.example.projectmobiledev.Map
 
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val firebaseDb = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/")
-        val myRef = firebaseDb.getReference("features")
-        database = firebaseDb.reference
 
-        var toilets: List<PublicToilet>?
 
-        myRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                toilets = dataSnapshot.getValue<List<PublicToilet>>()
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Failed to read value
-                Log.w("Testing", "Failed to read value.", error.toException())
-                Toast.makeText(this@MainActivity, "Failed to connect to database.", Toast.LENGTH_SHORT).show()
-            }
-        })
-
+        // intent to map
         val intent = Intent(this, Map::class.java)
         startActivity(intent)
+
 
         getToilets() // werkt goed
     }

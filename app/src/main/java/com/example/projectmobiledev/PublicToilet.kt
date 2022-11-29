@@ -1,23 +1,25 @@
 package com.example.projectmobiledev
 
 import android.util.Log
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
+import org.osmdroid.util.GeoPoint
+import java.sql.RowId
 
-@Serializable
-class PublicToilet()
-{
-    val id: Int = 0
-    val category: String = ""
-    val extraDescription: String = ""
-    val paying: String = ""
-    val street: String = ""
-    val houseNr: String = ""
-    val city: String= ""
-    val zipcode: Int = 0
-    val targetAudience: String= ""
-    val operatingHours: String = ""
-
+class PublicToilet(){
+    var ID: Int = 0
+    var CATEGORIE: String = ""
+    var OMSCHRIJVING: String = ""
+    var BETLAND: String = ""
+    var STRAAT: String = ""
+    var HUISNUMMER: String = ""
+    var DISTRICT: String= ""
+    var POSTCODE: Int = 0
+    var DOELGROEP: String= ""
+    var OPENINGSUREN_OPM: String = ""
+    var LAT: Double = 0.0
+    var LONG: Double = 0.0
 
     companion object {
         fun decodeJson(json: JsonObject): PublicToilet {
