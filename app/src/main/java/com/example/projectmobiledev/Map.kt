@@ -1,47 +1,62 @@
 package com.example.projectmobiledev
 
 import android.Manifest
-import android.content.Context
+import android.R.attr.*
 import android.content.pm.PackageManager
-import android.media.VolumeShaper.Configuration
-import android.os.Build
+import android.location.Location
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Toast
-import androidx.annotation.RequiresApi
-
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.android.gms.maps.model.Marker
-
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.material.navigation.NavigationView
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import org.osmdroid.config.Configuration.*
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.views.MapView
-import com.google.android.gms.internal.maps.zzaa
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
-import com.google.firebase.ktx.Firebase
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.ItemizedIconOverlay
-import org.osmdroid.views.overlay.ItemizedOverlay
 import org.osmdroid.views.overlay.OverlayItem
 
-import java.util.ArrayList
 
 class Map : AppCompatActivity() {
+    private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
 
     private lateinit var database: DatabaseReference
-    private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
     private lateinit var map : MapView
+    private lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var navView: NavigationView
+    private val toilets = ArrayList<PublicToilet>()
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_map)
+
+        val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
+        navView = findViewById<NavigationView>(R.id.navView)
+
+        toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.closed)
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        navView.setNavigationItemSelectedListener {
+            when(it.itemId){
+                it.itemId -> zoomToMarker(it.itemId)
+            }
+            true
+        }
+
         //handle permissions first, before map is created. not depicted here
 
         //load/initialize the osmdroid configuration, this can be done
@@ -55,7 +70,6 @@ class Map : AppCompatActivity() {
         //tile servers will get you banned based on this string.
 
         //inflate and create the map
-        setContentView(R.layout.activity_map)
 
         map = findViewById(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
@@ -65,6 +79,13 @@ class Map : AppCompatActivity() {
         //set the center point
         map.controller.setCenter(GeoPoint(51.219076, 4.414370))
         getToilets()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (toggle.onOptionsItemSelected(item)){
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 
@@ -132,13 +153,20 @@ class Map : AppCompatActivity() {
                 REQUEST_PERMISSIONS_REQUEST_CODE)
         }*/
     }
+    private fun zoomToMarker(markerID: Number){
+        val selected = toilets.find {
+            it.ID == markerID
+        } ?: return
+
+        map.controller.setZoom(18.5)
+        //set the center point to selected toilet
+        map.controller.setCenter(GeoPoint(selected.LAT, selected.LONG))
+    }
 
     private fun getToilets(){
         val firebaseDb = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/")
         val myRef = firebaseDb.getReference("features/features")
         database = firebaseDb.reference
-
-        val toilets = ArrayList<PublicToilet>()
 
         database.child("Toilets").get().addOnCompleteListener {
             if (it.isSuccessful) {
@@ -146,6 +174,8 @@ class Map : AppCompatActivity() {
                 it.result.children.forEach { toilet ->
                     val temp = toilet.getValue(PublicToilet::class.java)
                     toilets.add(temp!!)
+                    navView.menu.add(temp.ID, temp.ID, temp.ID, temp.OMSCHRIJVING)
+
                 }
                 setMarkers(toilets)
             } else {
@@ -153,4 +183,5 @@ class Map : AppCompatActivity() {
             }
         }
     }
+
 }
