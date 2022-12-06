@@ -17,7 +17,55 @@
       app:headerLayout="@layout/nav_header"
       app:menu="@menu/nav_drawer_menu"
       android:layout_gravity="start"
-    android:fitsSystemWindows="true" />
+      android:fitsSystemWindows="true" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Man of Vrouw" />
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent">
+
+          <RadioGroup
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              >
+              <RadioButton
+                  android:layout_width="wrap_content"
+                  android:layout_height="match_parent"
+                  android:text="@string/man"
+                  android:id="@+id/maleRB"/>
+              <RadioButton
+                  android:layout_width="wrap_content"
+                  android:layout_height="match_parent"
+                  android:text="@string/vrouw"
+                  android:id="@+id/femaleRB"/>
+          </RadioGroup>
+
+          <RadioGroup
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal">
+              <RadioButton
+                  android:layout_width="wrap_content"
+                  android:layout_height="match_parent"
+                  android:text="Aanwezig"
+                  android:id="@+id/diaperRB"/>
+              <RadioButton
+                  android:layout_width="wrap_content"
+                  android:layout_height="match_parent"
+                  android:text="Niet Aanwezig"
+                  android:id="@+id/noDiaperRB"/>
+          </RadioGroup>
+
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+  </com.google.android.material.navigation.NavigationView>
 
 
 </androidx.drawerlayout.widget.DrawerLayout>

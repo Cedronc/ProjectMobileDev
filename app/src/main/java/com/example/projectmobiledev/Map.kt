@@ -2,6 +2,7 @@ package com.example.projectmobiledev
 
 import android.Manifest
 import android.R.attr.*
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -15,6 +16,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
@@ -24,7 +26,10 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.ItemizedIconOverlay
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.OverlayItem
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 
 class Map : AppCompatActivity() {
@@ -36,6 +41,7 @@ class Map : AppCompatActivity() {
     private lateinit var navView: NavigationView
     private val toilets = ArrayList<PublicToilet>()
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var lastLocation: GeoPoint
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,12 +79,9 @@ class Map : AppCompatActivity() {
 
         map = findViewById(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
+        map.setMultiTouchControls(true)
 
-        //set the zoom level
-        map.controller.setZoom(16.0)
-        //set the center point
-        map.controller.setCenter(GeoPoint(51.219076, 4.414370))
-        getToilets()
+        getLocation()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -107,52 +110,32 @@ class Map : AppCompatActivity() {
         map.onPause()  //needed for compass, my location overlays, v6.0.0 and up
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun setMarkers(toilets: List<PublicToilet>?){
         val markers = ArrayList<OverlayItem>()
         if (toilets == null)
             return
         for (toilet in toilets){
             Log.d("markers", toilet.LAT.toString() + " " + toilet.LONG.toString())
-            val marker = OverlayItem(toilet.DOELGROEP, toilet.STRAAT, GeoPoint(toilet.LAT, toilet.LONG))
-            markers.add(marker)
+
+            val marker = Marker(map)
+            marker.position = GeoPoint(toilet.LAT, toilet.LONG)
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            marker.title = toilet.OMSCHRIJVING
+            marker.snippet = toilet.STRAAT
+            marker.id = toilet.ID.toString()
+
+            if (toilet.DOELGROEP == "man/vrouw")
+                marker.icon = resources.getDrawable(R.drawable.manwoman, null)
+
+
+            this.map.overlays?.add(marker)
         }
 
-        val locationOverlay = ItemizedIconOverlay(markers, null, applicationContext)
-        this.map.overlays?.add(locationOverlay)
+        //val locationOverlay = ItemizedIconOverlay(markers, null, applicationContext)
+        //this.map.overlays?.add(locationOverlay)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        val permissionsToRequest = ArrayList<String>()
-        var i = 0
-        while (i < grantResults.size) {
-            permissionsToRequest.add(permissions[i])
-            i++
-        }
-        if (permissionsToRequest.size > 0) {
-            ActivityCompat.requestPermissions(
-                this,
-                permissionsToRequest.toTypedArray(),
-                REQUEST_PERMISSIONS_REQUEST_CODE)
-        }
-    }
-
-    fun requestPermissionsIfNecessary(permissions: Array<String>) {
-        val permissionsToRequest = ArrayList<String>()
-        permissions.forEach { permission ->
-            if (ContextCompat.checkSelfPermission(this, permission)
-                != PackageManager.PERMISSION_GRANTED) {
-                // Permission is not granted
-                permissionsToRequest.add(permission)
-            }
-        }
-        /*if (permissionsToRequest.size > 0) {
-            ActivityCompat.requestPermissions(
-                this,
-                permissionsToRequest.add(0.toString()),
-                REQUEST_PERMISSIONS_REQUEST_CODE)
-        }*/
-    }
     private fun zoomToMarker(markerID: Number){
         val selected = toilets.find {
             it.ID == markerID
@@ -171,11 +154,11 @@ class Map : AppCompatActivity() {
         database.child("Toilets").get().addOnCompleteListener {
             if (it.isSuccessful) {
                 Log.d("Firebase", it.result.toString())
-                it.result.children.forEach { toilet ->
-                    val temp = toilet.getValue(PublicToilet::class.java)
-                    toilets.add(temp!!)
-                    navView.menu.add(temp.ID, temp.ID, temp.ID, temp.OMSCHRIJVING)
-
+                it.result.children.forEach { result ->
+                    val toilet = result.getValue(PublicToilet::class.java)
+                    toilets.add(toilet!!)
+                    orderList()
+                    navView.menu.add(toilet.ID, toilet.ID, getDistanceToUser(toilet).toInt(), toilet.OMSCHRIJVING)
                 }
                 setMarkers(toilets)
             } else {
@@ -184,4 +167,60 @@ class Map : AppCompatActivity() {
         }
     }
 
+    private fun getLocation(){
+        val hasPermission = ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if(!hasPermission){
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_PERMISSIONS_REQUEST_CODE
+            )
+        }
+        //set the zoom level
+        map.controller.setZoom(16.0)
+        //set the center point
+        map.controller.setCenter(GeoPoint(51.219076, 4.414370))
+        getToilets()
+
+        if(hasPermission){
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+            fusedLocationProviderClient.lastLocation.addOnSuccessListener {
+                lastLocation = GeoPoint(it.latitude, it.longitude)
+                map.controller.setCenter(lastLocation)
+
+                val locationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(this), map)
+                locationOverlay.enableMyLocation()
+                map.overlays.add(locationOverlay)
+            }.addOnFailureListener{
+                Log.d("ToiletFinder", it.toString())
+            }
+        }
+    }
+
+    private fun orderList(){
+        Log.d("OrderCheck", "Ordering list")
+        toilets.sortWith(compareBy { getDistanceToUser(it) })
+    }
+
+    private fun getDistanceToUser(toilet: PublicToilet): Float{
+        return convertLatLongToLocation(toilet.LAT, toilet.LONG).distanceTo(convertGeopointToLocation(lastLocation))
+    }
+
+    fun convertGeopointToLocation(geoPoint: GeoPoint): Location {
+        val location = Location("dummy provider")
+        location.latitude = geoPoint.latitude
+        location.longitude = geoPoint.longitude
+        return location
+    }
+
+    fun convertLatLongToLocation(lat: Double, long: Double): Location {
+        val location = Location("dummy provider")
+        location.latitude = lat
+        location.longitude = long
+        return location
+    }
 }

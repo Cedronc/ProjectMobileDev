@@ -2,5 +2,7 @@
     <string name="app_name">ToiletApp</string>
     <string name="open">Opened</string>
     <string name="closed">Closed</string>
+    <string name="man">Man</string>
+    <string name="vrouw">Vrouw</string>
 
 </resources>
