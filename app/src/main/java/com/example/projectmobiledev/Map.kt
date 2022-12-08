@@ -70,8 +70,8 @@ class Map : AppCompatActivity() {
     fun setMarkers(toilets: List<PublicToilet>, mapView: zzaa){
         val markers = ArrayList<OverlayItem>()
         for (toilet in toilets){
-            val marker = OverlayItem(toilet.name, toilet.address, toilet.location)
-            markers.add(marker)
+            //val marker = OverlayItem(toilet.name, toilet.address, toilet.location)
+            //markers.add(marker)
         }
 
         val locationOverlay = ItemizedIconOverlay(markers, null, applicationContext)
