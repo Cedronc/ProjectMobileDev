@@ -44,13 +44,22 @@ class Map : AppCompatActivity() {
       val user = FirebaseAuth.getInstance().currentUser
       if (user != null) {
         uid = user.uid
+        Toast.makeText(
+          applicationContext,
+          user.displayName,
+          Toast.LENGTH_LONG
+        ).show()
       }
 
-    Toast.makeText(
-      applicationContext,
-      uid,
-      Toast.LENGTH_LONG
-    ).show()
+    if(uid.equals("")){
+      Toast.makeText(
+        applicationContext,
+        "Niet ingelogd als gebruiker",
+        Toast.LENGTH_LONG
+      ).show()
+    }
+
+
 
 
     map = findViewById(R.id.map)
