@@ -74,10 +74,9 @@ class Login : AppCompatActivity() {
           val user: FirebaseUser = auth.getCurrentUser()!!
           if (user.isEmailVerified) {
             uid = auth.getCurrentUser()!!.getUid()
-            val mainActivity = Intent(
-              this@Login,
-              MainActivity::class.java
-            ) //We maken een nieuwe intent dat van de register pagina terug naar de login pagina laat gaan
+            //We maken een nieuwe intent dat van de register pagina terug naar de login pagina laat gaan
+            //TODO add user to intent or other way to get user to MainActivity
+            val mainActivity = Intent(this@Login,MainActivity::class.java)
             mainActivity.putExtra("UID", uid)
             startActivity(mainActivity) //We starten de intent
           } else {
