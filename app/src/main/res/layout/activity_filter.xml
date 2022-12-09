@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+android:layout_height="match_parent">
+
+
+    <TextView
+        android:id="@+id/genderTV"
+        android:layout_width="183dp"
+        android:layout_height="21dp"
+        android:layout_marginStart="16dp"
+
+        android:layout_marginTop="8dp"
+        android:text="Man of Vrouw"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupManVrouw"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/genderTV">
+
+        <RadioButton
+            android:id="@+id/maleRB"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:onClick="onRadioButtonClicked"
+            android:text="@string/man" />
+
+        <RadioButton
+            android:id="@+id/femaleRB"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:onClick="onRadioButtonClicked"
+            android:text="@string/vrouw" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/toegankelijkVoorRolstoelTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/toegankelijk_voor_rolstoel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroupManVrouw" />
+
+    <TextView
+        android:id="@+id/toegankelijkVoorRolstoelTV2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:text="Is er een luiertafel aanwezig"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroupDisabled" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupDisabled"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toegankelijkVoorRolstoelTV">
+
+        <RadioButton
+            android:id="@+id/HandicapJaRB"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:onClick="onRadioButtonClicked"
+            android:text="Aanwezig" />
+
+        <RadioButton
+            android:id="@+id/HandicapNeeRB"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:onClick="onRadioButtonClicked"
+            android:text="Niet Aanwezig" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/radioGroupDiaperTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toegankelijkVoorRolstoelTV2">
+
+        <RadioButton
+            android:id="@+id/diaperRB"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:onClick="onRadioButtonClicked"
+            android:text="Aanwezig" />
+
+        <RadioButton
+            android:id="@+id/noDiaperRB"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:onClick="onRadioButtonClicked"
+            android:text="Niet Aanwezig" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/set_filter_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Zet filters"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroupDiaperTable" />
+</androidx.constraintlayout.widget.ConstraintLayout>

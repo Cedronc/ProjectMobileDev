@@ -1,19 +1,24 @@
 package com.example.projectmobiledev
 
 import android.Manifest
-import android.R.attr.*
+//import android.R
+//import android.R.attr.*
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.provider.Settings
 import android.util.Log
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -25,9 +30,7 @@ import org.osmdroid.config.Configuration.*
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.ItemizedIconOverlay
 import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.OverlayItem
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
@@ -47,8 +50,16 @@ class Map : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
 
+        val filterBtn = findViewById<Button>(R.id.filter_btn)
+        filterBtn.setOnClickListener {
+            val intent = Intent(this, FilterActivity::class.java)
+            startActivity(intent)
+        }
+
+
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
-        navView = findViewById<NavigationView>(R.id.navView)
+        navView = findViewById(R.id.navView)
+
 
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.closed)
         drawerLayout.addDrawerListener(toggle)
@@ -82,6 +93,46 @@ class Map : AppCompatActivity() {
         map.setMultiTouchControls(true)
 
         getLocation()
+        getToilets()
+
+    }
+
+    private fun filterToilets() {
+        val filterArray = getIntentExtras()
+        val filteredToilets = ArrayList<PublicToilet>()
+        //check if filterArray is empty or is not initialized
+        if (filterArray.isEmpty()) {
+            return
+        }
+
+        when(filterArray[0]){
+            "male" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.DOELGROEP.contains("man/vrouw") })
+            "female" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.DOELGROEP.contains("vrouw") })
+            else -> filteredToilets.addAll(toilets.filter { toilet -> toilet.DOELGROEP.contains("man/vrouw") })
+        }
+
+        when(filterArray[1]){
+            "disabled" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.INTEGRAAL_TOEGANKELIJK.contains("ja") })
+            "notDisabled" ->
+                filteredToilets.addAll(toilets.filter {
+                        toilet -> toilet.INTEGRAAL_TOEGANKELIJK.contains("ja")
+                        || toilet.INTEGRAAL_TOEGANKELIJK.contains("nee") })
+            else -> Log.d("filter", "filters on both")
+        }
+
+        when(filterArray[2]){
+            "diaper" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.LUIERTAFEL.contains("ja") })
+            "notDiaper" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.LUIERTAFEL.contains("ja") || toilet.LUIERTAFEL.contains("nee") })
+            else -> Log.d("filter", "filters on both")
+        }
+    }
+
+    private fun getIntentExtras(): ArrayList<String> {
+        val filterArray = intent.getStringArrayListExtra("filter")
+        if (filterArray != null) {
+            return filterArray
+        }
+        return ArrayList()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -98,6 +149,8 @@ class Map : AppCompatActivity() {
         //if you make changes to the configuration, use
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+        getLocation()
+        filterToilets()
         map.onResume() //needed for compass, my location overlays, v6.0.0 and up
     }
 
@@ -112,7 +165,6 @@ class Map : AppCompatActivity() {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun setMarkers(toilets: List<PublicToilet>?){
-        val markers = ArrayList<OverlayItem>()
         if (toilets == null)
             return
         for (toilet in toilets){
@@ -157,8 +209,12 @@ class Map : AppCompatActivity() {
                 it.result.children.forEach { result ->
                     val toilet = result.getValue(PublicToilet::class.java)
                     toilets.add(toilet!!)
-                    orderList()
-                    navView.menu.add(toilet.ID, toilet.ID, getDistanceToUser(toilet).toInt(), toilet.OMSCHRIJVING)
+                    if (this::lastLocation.isInitialized){
+                        orderList()
+                        navView.menu.add(toilet.ID, toilet.ID, getDistanceToUser(toilet).toInt(), toilet.OMSCHRIJVING)
+                    }
+                    else
+                        navView.menu.add(toilet.ID, toilet.ID, toilet.ID, toilet.OMSCHRIJVING)
                 }
                 setMarkers(toilets)
             } else {
@@ -184,10 +240,13 @@ class Map : AppCompatActivity() {
         map.controller.setZoom(16.0)
         //set the center point
         map.controller.setCenter(GeoPoint(51.219076, 4.414370))
-        getToilets()
 
         if(hasPermission){
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+            if(!checkLocationEnabled()){
+                Toast.makeText(this, "Please enable location services", Toast.LENGTH_SHORT).show()
+                return
+            }
             fusedLocationProviderClient.lastLocation.addOnSuccessListener {
                 lastLocation = GeoPoint(it.latitude, it.longitude)
                 map.controller.setCenter(lastLocation)
@@ -199,6 +258,13 @@ class Map : AppCompatActivity() {
                 Log.d("ToiletFinder", it.toString())
             }
         }
+    }
+
+    private fun checkLocationEnabled(): Boolean {
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER
+        )
     }
 
     private fun orderList(){

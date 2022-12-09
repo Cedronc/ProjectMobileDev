@@ -20,14 +20,6 @@ class PublicToilet(){
     var OPENINGSUREN_OPM: String = ""
     var LAT: Double = 0.0
     var LONG: Double = 0.0
-
-    companion object {
-        fun decodeJson(json: JsonObject): PublicToilet {
-            return Json.decodeFromJsonElement(json)
-        }
-        fun getJson(text: String): JsonObject {
-            Log.d("JsonBuilder", Json.parseToJsonElement(text).toString())
-            return Json.parseToJsonElement(text).jsonObject
-        }
-    }
+    var INTEGRAAL_TOEGANKELIJK: String = ""
+    var LUIERTAFEL: String = ""
 }
