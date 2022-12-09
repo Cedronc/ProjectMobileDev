@@ -30,6 +30,15 @@ class Login : AppCompatActivity() {
 
       setContentView(R.layout.activity_login)
 
+      val user = FirebaseAuth.getInstance().currentUser
+      if (user != null) {
+        uid = user.uid
+
+        val mainActivity = Intent(this@Login, Map::class.java)
+        mainActivity.putExtra("UID", "")
+        startActivity(mainActivity)
+      }
+
       val login_button = findViewById<View>(R.id.login_button) as Button
       val continue_without_login = findViewById<View>(R.id.continue_without_login) as Button
       val email = findViewById<View>(R.id.email_login) as EditText

@@ -46,7 +46,7 @@ class Map : AppCompatActivity() {
         uid = user.uid
         Toast.makeText(
           applicationContext,
-          user.displayName,
+          user.email,
           Toast.LENGTH_LONG
         ).show()
       }
