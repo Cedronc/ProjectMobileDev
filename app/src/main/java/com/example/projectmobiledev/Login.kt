@@ -35,7 +35,7 @@ class Login : AppCompatActivity() {
         uid = user.uid
 
         val mainActivity = Intent(this@Login, Map::class.java)
-        mainActivity.putExtra("UID", "")
+        mainActivity.putExtra("UID", uid)
         startActivity(mainActivity)
       }
 
