@@ -1,31 +1,26 @@
 package com.example.projectmobiledev
 
-import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
-import android.media.VolumeShaper.Configuration
 import android.os.Bundle
 import android.preference.PreferenceManager
-
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.android.gms.maps.model.Marker
-
-import org.osmdroid.config.Configuration.*
+import com.google.android.gms.internal.maps.zzaa
+import com.google.firebase.auth.FirebaseAuth
+import org.osmdroid.config.Configuration.getInstance
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.MapView
-import com.google.android.gms.internal.maps.zzaa
 import org.osmdroid.views.overlay.ItemizedIconOverlay
-import org.osmdroid.views.overlay.ItemizedOverlay
 import org.osmdroid.views.overlay.OverlayItem
-
-import java.util.ArrayList
 
 class Map : AppCompatActivity() {
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
     private lateinit var map : MapView
-    override fun onCreate(savedInstanceState: Bundle?) {
+    var uid: String? = null
+
+  override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         //handle permissions first, before map is created. not depicted here
@@ -43,7 +38,22 @@ class Map : AppCompatActivity() {
         //inflate and create the map
         setContentView(R.layout.activity_map)
 
-        map = findViewById(R.id.map)
+      val intent = intent
+      uid = intent.getStringExtra("UID")
+
+      val user = FirebaseAuth.getInstance().currentUser
+      if (user != null) {
+        uid = user.uid
+      }
+
+    Toast.makeText(
+      applicationContext,
+      uid,
+      Toast.LENGTH_LONG
+    ).show()
+
+
+    map = findViewById(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
 
     }
