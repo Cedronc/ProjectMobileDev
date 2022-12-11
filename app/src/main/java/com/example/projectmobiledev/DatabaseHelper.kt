@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteDatabase.CursorFactory
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 
 class DatabaseHelper(context: Context, DATABASE_NAME: String?) : SQLiteOpenHelper(context, DATABASE_NAME, null, 1) {
@@ -81,7 +83,6 @@ class DatabaseHelper(context: Context, DATABASE_NAME: String?) : SQLiteOpenHelpe
         }
 
         db.insert(TABLE_NAME, null, values)
-        Log.d("db","TEST HELP ME PLS" +  db.insert(TABLE_NAME, null, values))
         db.close()
     }
 
@@ -114,6 +115,24 @@ class DatabaseHelper(context: Context, DATABASE_NAME: String?) : SQLiteOpenHelpe
         result.close()
         db.close()
         return PublicToilets
+    }
+
+    fun firebaseToDb(){
+        val firebaseDb = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/%22)")
+        val database = firebaseDb.reference
+        deleteDB()
+
+        database.child("Toilets").get().addOnSuccessListener {
+            if (it.exists()) {
+                Log.d("Firebase", it.toString())
+                it.children.forEach { result ->
+                    val toilet = result.getValue(PublicToilet::class.java)
+                    addToilet(toilet!!)
+                }
+            } else {
+                Log.d("ToiletFinder", "shit broke")
+            }
+        }
     }
 }
 
