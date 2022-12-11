@@ -23,6 +23,7 @@ class FilterActivity : AppCompatActivity() {
         val filterBtn = findViewById<Button>(R.id.set_filter_btn)
 
         filterBtn.setOnClickListener {
+            intentMap = Intent(this, Map::class.java)
             intentMap.putStringArrayListExtra("filter", filterArray)
             startActivity(intentMap)
         }
@@ -32,7 +33,7 @@ class FilterActivity : AppCompatActivity() {
         if (view is RadioButton) {
             // Is the button now checked?
             val checked = view.isChecked
-            intentMap = Intent(this, Map::class.java)
+
             // add string array
 
             // Check which radio button was clicked

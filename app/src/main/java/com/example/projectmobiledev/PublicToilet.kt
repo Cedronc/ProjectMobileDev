@@ -1,15 +1,8 @@
 package com.example.projectmobiledev
 
-import android.util.Log
-import com.google.android.gms.maps.model.LatLng
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.*
-import org.osmdroid.util.GeoPoint
-import java.sql.RowId
 
 class PublicToilet(){
     var ID: Int = 0
-    var CATEGORIE: String = ""
     var OMSCHRIJVING: String = ""
     var BETLAND: String = ""
     var STRAAT: String = ""

@@ -7,11 +7,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.sqlite.SQLiteDatabase
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.provider.Settings
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Button
@@ -42,13 +42,17 @@ class Map : AppCompatActivity() {
     private lateinit var map : MapView
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var navView: NavigationView
-    private val toilets = ArrayList<PublicToilet>()
+    private var toilets = ArrayList<PublicToilet>()
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var lastLocation: GeoPoint
+    private lateinit var dbHelper: DatabaseHelper
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
+
+        dbHelper = DatabaseHelper(this, "toiletsDB.db")
 
         val filterBtn = findViewById<Button>(R.id.filter_btn)
         filterBtn.setOnClickListener {
@@ -93,22 +97,26 @@ class Map : AppCompatActivity() {
         map.setMultiTouchControls(true)
 
         getLocation()
-        getToilets()
-
+        setVisuals(filterToilets())
     }
 
-    private fun filterToilets() {
+    private fun filterToilets(): ArrayList<PublicToilet> {
         val filterArray = getIntentExtras()
         val filteredToilets = ArrayList<PublicToilet>()
+        toilets = dbHelper.getToilets()
         //check if filterArray is empty or is not initialized
-        if (filterArray.isEmpty()) {
-            return
+        Log.d("filter", filterArray.toString())
+        if (filterArray.isEmpty()){
+            return toilets
+        }
+        if (filterArray[0] == "not set" && filterArray[1] == "not set" && filterArray[2] == "not set") {
+            Log.d("filter", "$toilets")
+            return toilets
         }
 
         when(filterArray[0]){
             "male" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.DOELGROEP.contains("man/vrouw") })
             "female" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.DOELGROEP.contains("vrouw") })
-            else -> filteredToilets.addAll(toilets.filter { toilet -> toilet.DOELGROEP.contains("man/vrouw") })
         }
 
         when(filterArray[1]){
@@ -117,14 +125,15 @@ class Map : AppCompatActivity() {
                 filteredToilets.addAll(toilets.filter {
                         toilet -> toilet.INTEGRAAL_TOEGANKELIJK.contains("ja")
                         || toilet.INTEGRAAL_TOEGANKELIJK.contains("nee") })
-            else -> Log.d("filter", "filters on both")
         }
 
         when(filterArray[2]){
             "diaper" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.LUIERTAFEL.contains("ja") })
             "notDiaper" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.LUIERTAFEL.contains("ja") || toilet.LUIERTAFEL.contains("nee") })
-            else -> Log.d("filter", "filters on both")
         }
+        Log.d("filter", "not filtered: $toilets")
+        Log.d("filter", "filtered: $filteredToilets")
+        return filteredToilets
     }
 
     private fun getIntentExtras(): ArrayList<String> {
@@ -150,7 +159,7 @@ class Map : AppCompatActivity() {
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
         getLocation()
-        filterToilets()
+        setVisuals(filterToilets())
         map.onResume() //needed for compass, my location overlays, v6.0.0 and up
     }
 
@@ -179,13 +188,13 @@ class Map : AppCompatActivity() {
 
             if (toilet.DOELGROEP == "man/vrouw")
                 marker.icon = resources.getDrawable(R.drawable.manwoman, null)
-
+            if (toilet.DOELGROEP == "vrouw")
+                marker.icon = resources.getDrawable(R.drawable.female, null)
+            if (toilet.DOELGROEP == "man")
+                marker.icon = resources.getDrawable(R.drawable.male, null)
 
             this.map.overlays?.add(marker)
         }
-
-        //val locationOverlay = ItemizedIconOverlay(markers, null, applicationContext)
-        //this.map.overlays?.add(locationOverlay)
     }
 
     private fun zoomToMarker(markerID: Number){
@@ -198,29 +207,36 @@ class Map : AppCompatActivity() {
         map.controller.setCenter(GeoPoint(selected.LAT, selected.LONG))
     }
 
-    private fun getToilets(){
-        val firebaseDb = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/")
-        val myRef = firebaseDb.getReference("features/features")
-        database = firebaseDb.reference
+    private fun setVisuals(toilets: ArrayList<PublicToilet>) {
+        navView.menu.clear()
+        addToiletsToMenu(toilets)
+        setMarkers(toilets)
+    }
 
-        database.child("Toilets").get().addOnCompleteListener {
-            if (it.isSuccessful) {
-                Log.d("Firebase", it.result.toString())
-                it.result.children.forEach { result ->
-                    val toilet = result.getValue(PublicToilet::class.java)
-                    toilets.add(toilet!!)
-                    if (this::lastLocation.isInitialized){
-                        orderList()
-                        navView.menu.add(toilet.ID, toilet.ID, getDistanceToUser(toilet).toInt(), toilet.OMSCHRIJVING)
-                    }
-                    else
-                        navView.menu.add(toilet.ID, toilet.ID, toilet.ID, toilet.OMSCHRIJVING)
-                }
-                setMarkers(toilets)
-            } else {
-                Log.d("ToiletFinder", it.exception?.message.toString())
+    private fun addToiletsToMenu(list: ArrayList<PublicToilet>) {
+        if (this::lastLocation.isInitialized) {
+            orderList(list)
+            list.forEach { toilet ->
+                Log.d("toilets", toilet.ID.toString())
+                navView.menu.add(
+                    toilet.ID,
+                    toilet.ID,
+                    getDistanceToUser(toilet).toInt(),
+                    toilet.OMSCHRIJVING
+                )
             }
-        }
+            return
+        } else
+            list.forEach { toilet ->
+                navView.menu.add(
+                    toilet.ID,
+                    toilet.ID,
+                    0,
+                    toilet.OMSCHRIJVING
+                )
+            }
+        return
+
     }
 
     private fun getLocation(){
@@ -248,6 +264,10 @@ class Map : AppCompatActivity() {
                 return
             }
             fusedLocationProviderClient.lastLocation.addOnSuccessListener {
+                if(it == null){
+                    Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
                 lastLocation = GeoPoint(it.latitude, it.longitude)
                 map.controller.setCenter(lastLocation)
 
@@ -267,9 +287,10 @@ class Map : AppCompatActivity() {
         )
     }
 
-    private fun orderList(){
+    private fun orderList(list: ArrayList<PublicToilet>): ArrayList<PublicToilet> {
         Log.d("OrderCheck", "Ordering list")
-        toilets.sortWith(compareBy { getDistanceToUser(it) })
+        list.sortWith(compareBy { getDistanceToUser(it) })
+        return list
     }
 
     private fun getDistanceToUser(toilet: PublicToilet): Float{
