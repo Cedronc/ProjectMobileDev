@@ -58,9 +58,16 @@ class Map : AppCompatActivity() {
             startActivity(intent)
         }
 
+        val addBtn = findViewById<Button>(R.id.add_toilet_btn)
+        addBtn.setOnClickListener {
+            val intent = Intent(this, AddToilet::class.java)
+            startActivity(intent)
+        }
+
 
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         navView = findViewById(R.id.navView)
+
 
 
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.closed)
