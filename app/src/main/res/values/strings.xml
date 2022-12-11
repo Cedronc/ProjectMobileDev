@@ -14,8 +14,12 @@
     <string name="registration_c_password">Confirm Password</string>
     <string name="registration_screen">REGISTER NOW!</string>
     <string name="continue_without_login">CONTINUE WITHOUT LOGIN</string>
-  
-  
+    <string name="add_toilet_string">ADD TOILET</string>
+
+
+
+
+
     <string name="logo">Logo</string>
     <string name="login_screen_string">LOGIN SCREEN</string>
     <string name="login_string">LOGIN</string>
