@@ -27,6 +27,16 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.osmdroid.config.Configuration.*
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.preference.PreferenceManager
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.android.gms.internal.maps.zzaa
+import com.google.firebase.auth.FirebaseAuth
+import org.osmdroid.config.Configuration.getInstance
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -34,6 +44,9 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
+
+import org.osmdroid.views.overlay.ItemizedIconOverlay
+import org.osmdroid.views.overlay.OverlayItem
 
 class Map : AppCompatActivity() {
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
@@ -49,6 +62,9 @@ class Map : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+    var uid: String? = null
+
+  override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
 
@@ -92,7 +108,31 @@ class Map : AppCompatActivity() {
 
         //inflate and create the map
 
-        map = findViewById(R.id.map)
+      val intent = intent
+      uid = intent.getStringExtra("UID")
+
+      val user = FirebaseAuth.getInstance().currentUser
+      if (user != null) {
+        uid = user.uid
+        Toast.makeText(
+          applicationContext,
+          user.email,
+          Toast.LENGTH_LONG
+        ).show()
+      }
+
+    if(uid.equals("")){
+      Toast.makeText(
+        applicationContext,
+        "Niet ingelogd als gebruiker",
+        Toast.LENGTH_LONG
+      ).show()
+    }
+
+
+
+
+    map = findViewById(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setMultiTouchControls(true)
 
