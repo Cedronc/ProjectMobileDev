@@ -7,7 +7,7 @@
     tools:context=".AddToilet">
 
   <TextView
-    android:id="@+id/registration_screen_textview_login"
+    android:id="@+id/add_toilet_textview_add_toilet"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="100dp"
@@ -22,4 +22,55 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent" />
 
+  <com.google.android.material.textfield.TextInputLayout
+    android:id="@+id/add_toilet_omschrijving"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="100dp"
+    android:layout_marginTop="25dp"
+    android:layout_marginEnd="100dp"
+    android:textColorHint="@color/app_TextColor"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.0"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/add_toilet_textview_add_toilet">
+
+    <EditText
+      android:id="@+id/add_toilet_edittext_omschrijving"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:drawablePadding="5dp"
+      android:hint="@string/add_toilet_omschrijving"
+      android:importantForAutofill="no"
+      android:inputType="text"
+      android:textColor="@color/app_TextColor"
+      android:textSize="14sp"
+      tools:ignore="SpeakableTextPresentCheck" />
+  </com.google.android.material.textfield.TextInputLayout>
+
+  <com.google.android.material.textfield.TextInputLayout
+    android:id="@+id/add_toilet_straatnaam"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="100dp"
+    android:layout_marginTop="25dp"
+    android:layout_marginEnd="100dp"
+    android:textColorHint="@color/app_TextColor"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.0"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/add_toilet_omschrijving">
+
+    <EditText
+      android:id="@+id/add_toilet_edittext_straatnaam"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:drawablePadding="5dp"
+      android:hint="@string/add_toilet_straatnaam"
+      android:importantForAutofill="no"
+      android:inputType="text"
+      android:textColor="@color/app_TextColor"
+      android:textSize="14sp"
+      tools:ignore="SpeakableTextPresentCheck" />
+  </com.google.android.material.textfield.TextInputLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

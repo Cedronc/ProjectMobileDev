@@ -20,6 +20,8 @@
 
 
 
+  <string name="add_toilet_omschrijving">Omschrijving</string>
+  <string name="add_toilet_straatnaam">Straatnaam</string>
 
     <string name="logo">Logo</string>
     <string name="login_screen_string">LOGIN SCREEN</string>
