@@ -15,54 +15,31 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import java.util.*
 
-
 class AddToilet : AppCompatActivity() {
   var ref: DatabaseReference? = null
   var uid: String? = null
-    val firebaseDb = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/")
+  val firebaseDb = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/")
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_toilet)
+  var integraalToegankelijk = false
+  var luiertafel = false
+  var betalend = false
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_add_toilet)
 
     val intent = intent
     uid = intent.getStringExtra("UID")
 
-    val add_toilet_button = findViewById<View>(R.id.add_toilet_button) as Button
+    val add_toilet_button = findViewById<Button>(R.id.add_toilet_button)
     val omschrijving = findViewById<View>(R.id.add_toilet_edittext_omschrijving) as EditText
     val straatnaam = findViewById<View>(R.id.add_toilet_edittext_straatnaam) as EditText
     val huisnummer = findViewById<View>(R.id.add_toilet_edittext_huisnummer) as EditText
     val district = findViewById<View>(R.id.add_toilet_edittext_district) as EditText
-    val postcode = findViewById<View>(R.id.add_toilet_postcode) as EditText
+    val postcode = findViewById<View>(R.id.add_toilet_edittext_postcode) as EditText
     val doelgroep = findViewById<View>(R.id.add_toilet_edittext_doelgroep) as EditText
     val openingsuren = findViewById<View>(R.id.add_toilet_edittext_openingsuren) as EditText
-    var integraalToegankelijk = false
-    var luiertafel = false
-    var betalend = false
 
-    fun onCheckboxClicked(view: View) {
-      if (view is CheckBox) {
-        val checked: Boolean = view.isChecked
-
-        when (view.id) {
-          R.id.add_toilet_integraal_toegankelijk -> {
-            if (checked) {
-              integraalToegankelijk = true
-            }
-          }
-          R.id.add_toilet_luiertafel -> {
-            if (checked) {
-              luiertafel = true
-            }
-          }
-          R.id.add_toilet_betalend -> {
-            if (checked) {
-              betalend = true
-            }
-          }
-        }
-      }
-    }
 
     var maxGebruikersNr = 0
 
@@ -77,8 +54,10 @@ class AddToilet : AppCompatActivity() {
       override fun onCancelled(databaseError: DatabaseError) {}
     })
 
-    add_toilet_button.setOnClickListener(View.OnClickListener {
-      ref = FirebaseDatabase.getInstance().reference.child("ToiletsTest").child(maxGebruikersNr.toString())
+    add_toilet_button.setOnClickListener {
+      Log.d("addtoilet", "add toilet button clicked")
+      ref = FirebaseDatabase.getInstance().reference.child("ToiletsTest")
+        .child(maxGebruikersNr.toString())
       ref!!.addValueEventListener(object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
           if (dataSnapshot.exists()) {
@@ -107,32 +86,56 @@ class AddToilet : AppCompatActivity() {
           Toast.makeText(applicationContext, "ERROR", Toast.LENGTH_SHORT).show()
         }
       })
-    })
+    }
+
     //saveUUID()
-        Log.d("UUID", getCurrentUUID())
-        findViewById<Button>(R.id.add_toilet_button).setOnClickListener {
-            //TODO: push toilet to database
+    Log.d("UUID", getCurrentUUID())
+    findViewById<Button>(R.id.add_toilet_button).setOnClickListener {
+      //TODO: push toilet to database
 
-            val newUUID = UUID.randomUUID().toString()
-            setNewUUIDFirebase(newUUID)
+      val newUUID = UUID.randomUUID().toString()
+      setNewUUIDFirebase(newUUID)
+    }
+  }
+  private fun setNewUUIDFirebase(newUUID: String) {
+    val database = firebaseDb.reference
+    database.child("ToiletUUID").setValue(newUUID)
+  }
+
+  private fun saveUUID() {
+    val sharedPref = this.getSharedPreferences("toilet", Context.MODE_PRIVATE)
+    with (sharedPref.edit()) {
+      putString(getString(R.string.toiletUUID), "TESTOSTERONE-426c-4043-9026-dde7a9b3beb0")
+      apply()
+    }
+  }
+
+  fun getCurrentUUID(): String {
+    val uuid = this.getSharedPreferences("toilet", Context.MODE_PRIVATE)
+    return uuid.getString("ToiletUUID", null).toString()
+  }
+
+  fun onCheckboxClicked(view: View) {
+    if (view is CheckBox) {
+      val checked: Boolean = view.isChecked
+
+      when (view.id) {
+        R.id.add_toilet_integraal_toegankelijk -> {
+          if (checked) {
+            integraalToegankelijk = true
+          }
         }
-    }
-
-    private fun setNewUUIDFirebase(newUUID: String) {
-        val database = firebaseDb.reference
-        database.child("ToiletUUID").setValue(newUUID)
-    }
-
-    private fun saveUUID() {
-        val sharedPref = this.getSharedPreferences("toilet", Context.MODE_PRIVATE)
-        with (sharedPref.edit()) {
-            putString(getString(R.string.toiletUUID), "TESTOSTERONE-426c-4043-9026-dde7a9b3beb0")
-            apply()
+        R.id.add_toilet_luiertafel -> {
+          if (checked) {
+            luiertafel = true
+          }
         }
+        R.id.add_toilet_betalend -> {
+          if (checked) {
+            betalend = true
+          }
+        }
+      }
     }
-
-    fun getCurrentUUID(): String {
-        val uuid = this.getSharedPreferences("toilet", Context.MODE_PRIVATE)
-        return uuid.getString("ToiletUUID", null).toString()
-    }
+  }
 }
