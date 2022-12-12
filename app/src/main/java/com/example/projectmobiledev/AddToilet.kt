@@ -13,19 +13,19 @@ class AddToilet : AppCompatActivity() {
 
 
         //saveUUID()
-
+        Log.d("UUID", getCurrentUUID())
     }
 
     private fun saveUUID() {
-        val sharedPref = this.getPreferences(Context.MODE_PRIVATE)
+        val sharedPref = this.getSharedPreferences("toilet", Context.MODE_PRIVATE)
         with (sharedPref.edit()) {
-            putString(getString(R.string.toiletUUID), "69bf192e-426c-4043-9026-dde7a9b3beb0")
+            putString(getString(R.string.toiletUUID), "TESTOSTERONE-426c-4043-9026-dde7a9b3beb0")
             apply()
         }
     }
 
-    private fun getCurrentUUID(): String {
-        val uuid = this.getPreferences(Context.MODE_PRIVATE)
+    fun getCurrentUUID(): String {
+        val uuid = this.getSharedPreferences("toilet", Context.MODE_PRIVATE)
         return uuid.getString("ToiletUUID", null).toString()
     }
 }

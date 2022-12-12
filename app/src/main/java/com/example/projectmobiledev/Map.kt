@@ -68,8 +68,6 @@ class Map : AppCompatActivity() {
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         navView = findViewById(R.id.navView)
 
-
-
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.closed)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
@@ -187,6 +185,12 @@ class Map : AppCompatActivity() {
         //if you make changes to the configuration, use
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+
+        val uuid = this.getSharedPreferences("toilet",Context.MODE_PRIVATE)
+        val temp =  uuid.getString("ToiletUUID", null).toString()
+        Log.d("UUID", temp)
+        //TODO: add check if UUID on phone is not different from firebase (if so, update database)
+
         getLocation()
         setVisuals(filterToilets())
         map.onResume() //needed for compass, my location overlays, v6.0.0 and up
