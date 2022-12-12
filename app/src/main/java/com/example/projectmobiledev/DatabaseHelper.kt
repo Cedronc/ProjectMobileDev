@@ -118,7 +118,7 @@ class DatabaseHelper(context: Context, DATABASE_NAME: String?) : SQLiteOpenHelpe
     }
 
     fun firebaseToDb(){
-        val firebaseDb = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/%22)")
+        val firebaseDb = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/")
         val database = firebaseDb.reference
         deleteDB()
 

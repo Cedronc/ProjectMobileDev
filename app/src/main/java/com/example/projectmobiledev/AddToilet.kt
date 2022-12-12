@@ -12,8 +12,7 @@ class AddToilet : AppCompatActivity() {
 
 
 
-        //saveUUID()
-        Log.d("UUID", getCurrentUUID())
+        
     }
 
     private fun saveUUID() {
