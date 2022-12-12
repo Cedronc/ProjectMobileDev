@@ -231,7 +231,7 @@
     app:layout_constraintTop_toBottomOf="@+id/add_toilet_integraal_toegankelijk" />
 
   <Button
-    android:id="@+id/login_button"
+    android:id="@+id/push_toilet_btn"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="100dp"
