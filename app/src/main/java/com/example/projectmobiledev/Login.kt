@@ -39,7 +39,7 @@ class Login : AppCompatActivity() {
         startActivity(mainActivity)
       }
 
-      val login_button = findViewById<View>(R.id.login_button) as Button
+      val login_button = findViewById<View>(R.id.push_toilet_btn) as Button
       val continue_without_login = findViewById<View>(R.id.continue_without_login) as Button
       val email = findViewById<View>(R.id.email_login) as EditText
       val password = findViewById<View>(R.id.password_login) as EditText
