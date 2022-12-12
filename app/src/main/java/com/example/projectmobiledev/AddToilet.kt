@@ -11,27 +11,19 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.*
-
-class AddToilet : AppCompatActivity() {
-  var ref: DatabaseReference? = null
-  var uid: String? = null
-import android.widget.Button
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import java.util.*
 
-class AddToilet : AppCompatActivity() {
 
+class AddToilet : AppCompatActivity() {
+  var ref: DatabaseReference? = null
+  var uid: String? = null
     val firebaseDb = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_toilet)
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_add_toilet)
 
     val intent = intent
     uid = intent.getStringExtra("UID")
@@ -116,10 +108,9 @@ class AddToilet : AppCompatActivity() {
         }
       })
     })
-    s
     //saveUUID()
         Log.d("UUID", getCurrentUUID())
-        findViewById<Button>(R.id.push_toilet_btn).setOnClickListener {
+        findViewById<Button>(R.id.add_toilet_button).setOnClickListener {
             //TODO: push toilet to database
 
             val newUUID = UUID.randomUUID().toString()
