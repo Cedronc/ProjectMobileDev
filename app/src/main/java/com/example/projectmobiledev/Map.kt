@@ -189,12 +189,11 @@ class Map : AppCompatActivity() {
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
 
-        val uuid = this.getSharedPreferences("toilet",Context.MODE_PRIVATE)
-        val temp =  uuid.getString("ToiletUUID", null).toString()
-        Log.d("UUID", temp)
+        val uuid = this.getSharedPreferences("toilet",Context.MODE_PRIVATE).getString("ToiletUUID", null).toString()
+        Log.d("UUID", uuid)
 
         //TODO: add check if UUID on phone is not different from firebase (if so, update database)
-        checkToiletUUID(temp)
+        checkToiletUUID(uuid)
 
 
         getLocation()
