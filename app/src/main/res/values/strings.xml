@@ -20,13 +20,22 @@
 
 
 
+
   <string name="add_toilet_omschrijving">Omschrijving</string>
   <string name="add_toilet_straatnaam">Straatnaam</string>
+  <string name="add_toilet_huisnummer">Huisnummer</string>
+  <string name="add_toilet_district">District</string>
+  <string name="add_toilet_postcode">Postcode</string>
+  <string name="add_toilet_doelgroep">Doelgroep</string>
+  <string name="add_toilet_openingsuren">Openingsuren</string>
+  <string name="add_toilet_luiertafel">Luitertafel</string>
 
-    <string name="logo">Logo</string>
+
+  <string name="logo">Logo</string>
     <string name="login_screen_string">LOGIN SCREEN</string>
     <string name="login_string">LOGIN</string>
     <string name="create_new_account">Create New Account</string>
     <string name="already_have_an_account">ALREADY HAVE AN ACCOUNT</string>
+  <string name="add_toilet_integraal_toegankelijk">Integraal Toegankelijk</string>
 
 </resources>
