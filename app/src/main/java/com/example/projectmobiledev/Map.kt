@@ -8,25 +8,24 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.database.DatabaseReference
-import org.osmdroid.config.Configuration.*
-import android.preference.PreferenceManager
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import org.osmdroid.config.Configuration.getInstance
+import org.osmdroid.config.Configuration.*
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -61,7 +60,16 @@ class Map : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val addBtn = findViewById<Button>(R.id.add_toilet_btn)
+      val addBtn = findViewById<Button>(R.id.add_toilet_btn)
+
+      val usertemp = FirebaseAuth.getInstance().currentUser
+        if (usertemp != null) {
+          uid = usertemp.uid
+          addBtn.setVisibility(View.VISIBLE)
+        }else{
+          addBtn.setVisibility(View.INVISIBLE)
+        }
+
         addBtn.setOnClickListener {
             val intent = Intent(this, AddToilet::class.java)
             startActivity(intent)
