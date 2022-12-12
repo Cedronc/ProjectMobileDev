@@ -116,16 +116,6 @@ class AddToilet : AppCompatActivity() {
         }
       })
     })
-    s
-    //saveUUID()
-        Log.d("UUID", getCurrentUUID())
-        findViewById<Button>(R.id.push_toilet_btn).setOnClickListener {
-            //TODO: push toilet to database
-
-            val newUUID = UUID.randomUUID().toString()
-            setNewUUIDFirebase(newUUID)
-        }
-    }
 
     private fun setNewUUIDFirebase(newUUID: String) {
         val database = firebaseDb.reference
