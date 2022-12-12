@@ -23,6 +23,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import org.osmdroid.config.Configuration.getInstance
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -189,11 +192,35 @@ class Map : AppCompatActivity() {
         val uuid = this.getSharedPreferences("toilet",Context.MODE_PRIVATE)
         val temp =  uuid.getString("ToiletUUID", null).toString()
         Log.d("UUID", temp)
+
         //TODO: add check if UUID on phone is not different from firebase (if so, update database)
+        checkToiletUUID(temp)
+
 
         getLocation()
         setVisuals(filterToilets())
         map.onResume() //needed for compass, my location overlays, v6.0.0 and up
+    }
+
+    private fun checkToiletUUID(uuid: String) {
+        val firebaseDb = Firebase.database("https://mobiledevproject-e36ca-default-rtdb.europe-west1.firebasedatabase.app/")
+        database = firebaseDb.reference
+
+        database.child("ToiletUUID").get().addOnSuccessListener {
+            if (it.exists()){
+                if (it.value.toString() != uuid){
+                    Log.d("UUID", "UUID is different")
+                    dbHelper.firebaseToDb()
+                    val sharedPref = this.getSharedPreferences("toilet", Context.MODE_PRIVATE)
+                    with (sharedPref.edit()) {
+                        putString(getString(R.string.toiletUUID), it.value.toString())
+                        apply()
+                    }
+                }
+            }else{
+                Log.d("UUID", "UUID does not exist")
+            }
+        }
     }
 
     override fun onPause() {
