@@ -40,32 +40,26 @@ class FilterActivity : AppCompatActivity() {
             when (view.getId()) {
                 R.id.maleRB ->
                     if (checked) {
-                        Log.d("radio", "male")
                         filterArray[0] = "male"
                     }
                 R.id.femaleRB ->
                     if (checked) {
-                        Log.d("radio", "female")
                         filterArray[0] = "female"
                     }
                 R.id.HandicapJaRB ->
                     if (checked) {
-                        Log.d("radio", "disabled")
                         filterArray[1] = "disabled"
                     }
                 R.id.HandicapNeeRB ->
                     if (checked) {
-                        Log.d("radio", "disabled")
                         filterArray[1] = "notDisabled"
                     }
                 R.id.diaperRB ->
                     if (checked) {
-                        Log.d("radio", "diaper")
                         filterArray[2] = "diaper"
                     }
                 R.id.noDiaperRB ->
                     if (checked) {
-                        Log.d("radio", "no diaper")
                         filterArray[2] = "noDiaper"
                     }
             }

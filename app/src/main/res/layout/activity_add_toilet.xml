@@ -245,28 +245,12 @@
     app:layout_constraintTop_toBottomOf="@+id/add_toilet_luiertafel" />
 
   <Button
-      android:id="@+id/add_toilet_button"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="100dp"
-      android:layout_marginEnd="100dp"
-      android:background="@color/app_Orange"
-      android:onClick="test"
-      android:text="@string/add_toilet_betalend"
-      android:textAlignment="center"
-      android:textColor="@color/app_Background"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.0"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/add_toilet_betalend"
-      app:layout_constraintVertical_bias="0.292"
-      tools:ignore="TextContrastCheck" />
-
-  <Button
       android:id="@+id/button_1"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Button"
-      tools:layout_editor_absoluteY="660dp" />
+      android:text="@string/add_toilet"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/add_toilet_betalend" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -111,7 +111,6 @@ class DatabaseHelper(context: Context, DATABASE_NAME: String?) : SQLiteOpenHelpe
                 PublicToilets.add(PublicToilet)
             } while (result.moveToNext())
         }
-        Log.d("db", "Toilets $PublicToilets")
         result.close()
         db.close()
         return PublicToilets
@@ -124,7 +123,6 @@ class DatabaseHelper(context: Context, DATABASE_NAME: String?) : SQLiteOpenHelpe
 
         database.child("Toilets").get().addOnSuccessListener {
             if (it.exists()) {
-                Log.d("Firebase", it.toString())
                 it.children.forEach { result ->
                     val toilet = result.getValue(PublicToilet::class.java)
                     addToilet(toilet!!)

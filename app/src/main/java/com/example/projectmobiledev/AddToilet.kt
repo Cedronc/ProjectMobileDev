@@ -3,7 +3,6 @@ package com.example.projectmobiledev
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
@@ -14,7 +13,6 @@ import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import java.util.*
-import kotlin.collections.Map
 
 class AddToilet : AppCompatActivity() {
   var ref: DatabaseReference? = null
@@ -32,7 +30,11 @@ class AddToilet : AppCompatActivity() {
     val intent = intent
     uid = intent.getStringExtra("UID")
 
-    val add_toilet_button = findViewById<View>(R.id.add_toilet_button) as Button
+    var lat = 0.0
+    var long = 0.0
+
+    lat = intent.getStringExtra("lat")?.toDouble() ?: 0.0
+    long = intent.getStringExtra("long")?.toDouble() ?: 0.0
 
     val omschrijving = findViewById<View>(R.id.add_toilet_edittext_omschrijving) as EditText
     val straatnaam = findViewById<View>(R.id.add_toilet_edittext_straatnaam) as EditText
@@ -58,11 +60,9 @@ class AddToilet : AppCompatActivity() {
 
 
     button.setOnClickListener {
-      Log.d("addtoilet", "add toilet button clicked")
       ref = FirebaseDatabase.getInstance().reference.child("Toilets")
       ref!!.addValueEventListener(object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
-          Log.d("addtoilet", "niet ver: $maxGebruikersNr")
           if (dataSnapshot.exists()) {
             val toilet = PublicToilet()
             toilet.ID = maxGebruikersNr
@@ -71,18 +71,21 @@ class AddToilet : AppCompatActivity() {
             toilet.STRAAT = straatnaam.text.toString()
             toilet.HUISNUMMER = huisnummer.text.toString()
             toilet.DISTRICT = district.text.toString()
-            //TODO: null check
+            if (postcode.text.toString() != "") {
+                toilet.POSTCODE = postcode.text.toString().toInt()
+            } else {
+              toilet.POSTCODE = 0
+            }
             toilet.POSTCODE = postcode.text.toString().toInt()
             toilet.DOELGROEP = doelgroep.text.toString()
             toilet.OPENINGSUREN_OPM = openingsuren.text.toString()
             toilet.INTEGRAAL_TOEGANKELIJK = integraalToegankelijk.toString()
             toilet.LUIERTAFEL = luiertafel.toString()
-
-            Log.d("addtoilet", "toilet: $toilet")
+            toilet.LAT = lat
+            toilet.LONG = long
 
             val reff = FirebaseDatabase.getInstance().reference.child("Toilets")
             reff.child(maxGebruikersNr.toString()).setValue(toilet)
-            Log.d("addtoilet", "ver: $maxGebruikersNr")
 
             val newUUID = UUID.randomUUID().toString()
             setNewUUIDFirebase(newUUID)
@@ -100,12 +103,6 @@ class AddToilet : AppCompatActivity() {
       })
     }
   }
-
-
-  fun test(){
-    Log.d("addtoilet", "test")
-  }
-
 
   private fun setNewUUIDFirebase(newUUID: String) {
     val database = firebaseDb.reference

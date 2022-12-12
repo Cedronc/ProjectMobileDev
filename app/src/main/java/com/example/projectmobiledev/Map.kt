@@ -47,11 +47,11 @@ class Map : AppCompatActivity() {
     private lateinit var dbHelper: DatabaseHelper
 
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         var uid: String? = null
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
-
         dbHelper = DatabaseHelper(this, "toiletsDB.db")
 
         val filterBtn = findViewById<Button>(R.id.filter_btn)
@@ -72,6 +72,10 @@ class Map : AppCompatActivity() {
 
         addBtn.setOnClickListener {
             val intent = Intent(this, AddToilet::class.java)
+            if (this::lastLocation.isInitialized) {
+                intent.putExtra("lat", lastLocation.latitude)
+                intent.putExtra("lon", lastLocation.longitude)
+            }
             startActivity(intent)
         }
 
@@ -143,34 +147,33 @@ class Map : AppCompatActivity() {
         val filteredToilets = ArrayList<PublicToilet>()
         toilets = dbHelper.getToilets()
         //check if filterArray is empty or is not initialized
-        Log.d("filter", filterArray.toString())
         if (filterArray.isEmpty()){
             return toilets
         }
         if (filterArray[0] == "not set" && filterArray[1] == "not set" && filterArray[2] == "not set") {
-            Log.d("filter", "$toilets")
             return toilets
         }
 
         when(filterArray[0]){
-            "male" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.DOELGROEP.contains("man/vrouw") })
-            "female" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.DOELGROEP.contains("vrouw") })
+            "male" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.DOELGROEP.lowercase().trim().contains("man/vrouw") || toilet.DOELGROEP.lowercase().trim().contains("man") })
+            "female" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.DOELGROEP.lowercase().trim().contains("vrouw") })
         }
 
         when(filterArray[1]){
-            "disabled" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.INTEGRAAL_TOEGANKELIJK.contains("ja") })
-            "notDisabled" ->
+            "disabled" -> {
+                filteredToilets.addAll(toilets.filter { toilet -> toilet.INTEGRAAL_TOEGANKELIJK.lowercase().trim().contains("ja") })
+            }
+            "notDisabled" -> {
                 filteredToilets.addAll(toilets.filter {
-                        toilet -> toilet.INTEGRAAL_TOEGANKELIJK.contains("ja")
-                        || toilet.INTEGRAAL_TOEGANKELIJK.contains("nee") })
+                        toilet -> toilet.INTEGRAAL_TOEGANKELIJK.lowercase().trim().contains("ja")
+                        || toilet.INTEGRAAL_TOEGANKELIJK.lowercase().trim().contains("nee") })
+            }
         }
 
         when(filterArray[2]){
-            "diaper" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.LUIERTAFEL.contains("ja") })
-            "notDiaper" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.LUIERTAFEL.contains("ja") || toilet.LUIERTAFEL.contains("nee") })
+            "diaper" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.LUIERTAFEL.lowercase().trim().contains("ja") })
+            "notDiaper" -> filteredToilets.addAll(toilets.filter { toilet -> toilet.LUIERTAFEL.lowercase().trim().contains("ja") || toilet.LUIERTAFEL.lowercase().trim().contains("nee") })
         }
-        Log.d("filter", "not filtered: $toilets")
-        Log.d("filter", "filtered: $filteredToilets")
         return filteredToilets
     }
 
@@ -198,9 +201,6 @@ class Map : AppCompatActivity() {
         //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
 
         val uuid = this.getSharedPreferences("toilet",Context.MODE_PRIVATE).getString("ToiletUUID", null).toString()
-        Log.d("UUID", uuid)
-
-        //TODO: add check if UUID on phone is not different from firebase (if so, update database)
         checkToiletUUID(uuid)
 
 
@@ -216,7 +216,6 @@ class Map : AppCompatActivity() {
         database.child("ToiletUUID").get().addOnSuccessListener {
             if (it.exists()){
                 if (it.value.toString() != uuid){
-                    Log.d("UUID", "UUID is different")
                     dbHelper.firebaseToDb()
                     val sharedPref = this.getSharedPreferences("toilet", Context.MODE_PRIVATE)
                     with (sharedPref.edit()) {
@@ -244,7 +243,6 @@ class Map : AppCompatActivity() {
         if (toilets == null)
             return
         for (toilet in toilets){
-            Log.d("markers", toilet.LAT.toString() + " " + toilet.LONG.toString())
 
             val marker = Marker(map)
             marker.position = GeoPoint(toilet.LAT, toilet.LONG)
@@ -284,7 +282,6 @@ class Map : AppCompatActivity() {
         if (this::lastLocation.isInitialized) {
             orderList(list)
             list.forEach { toilet ->
-                Log.d("toilets", toilet.ID.toString())
                 navView.menu.add(
                     toilet.ID,
                     toilet.ID,
@@ -342,7 +339,6 @@ class Map : AppCompatActivity() {
                 locationOverlay.enableMyLocation()
                 map.overlays.add(locationOverlay)
             }.addOnFailureListener{
-                Log.d("ToiletFinder", it.toString())
             }
         }
     }
@@ -355,7 +351,6 @@ class Map : AppCompatActivity() {
     }
 
     private fun orderList(list: ArrayList<PublicToilet>): ArrayList<PublicToilet> {
-        Log.d("OrderCheck", "Ordering list")
         list.sortWith(compareBy { getDistanceToUser(it) })
         return list
     }
