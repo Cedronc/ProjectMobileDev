@@ -37,5 +37,6 @@
     <string name="create_new_account">Create New Account</string>
     <string name="already_have_an_account">ALREADY HAVE AN ACCOUNT</string>
   <string name="add_toilet_integraal_toegankelijk">Integraal Toegankelijk</string>
+  <string name="add_toilet_betalend">Betalend</string>
 
 </resources>

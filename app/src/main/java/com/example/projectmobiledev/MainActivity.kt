@@ -23,8 +23,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-
         // intent to map
         val intent = Intent(this, Map::class.java)
         startActivity(intent)

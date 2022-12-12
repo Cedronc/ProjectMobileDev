@@ -13,7 +13,7 @@
     android:layout_marginStart="100dp"
     android:layout_marginEnd="100dp"
     android:gravity="center"
-    android:paddingTop="30dp"
+    android:paddingTop="15dp"
     android:text="@string/add_toilet_string"
     android:textColor="@color/app_TextColor"
     android:visibility="visible"
@@ -27,7 +27,7 @@
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="100dp"
-    android:layout_marginTop="25dp"
+    android:layout_marginTop="15dp"
     android:layout_marginEnd="100dp"
     android:textColorHint="@color/app_TextColor"
     app:layout_constraintEnd_toEndOf="parent"
@@ -53,7 +53,7 @@
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="100dp"
-    android:layout_marginTop="25dp"
+    android:layout_marginTop="15dp"
     android:layout_marginEnd="100dp"
     android:textColorHint="@color/app_TextColor"
     app:layout_constraintEnd_toEndOf="parent"
@@ -79,7 +79,7 @@
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="100dp"
-    android:layout_marginTop="25dp"
+    android:layout_marginTop="15dp"
     android:layout_marginEnd="100dp"
     android:textColorHint="@color/app_TextColor"
     app:layout_constraintEnd_toEndOf="parent"
@@ -105,7 +105,7 @@
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="100dp"
-    android:layout_marginTop="25dp"
+    android:layout_marginTop="15dp"
     android:layout_marginEnd="100dp"
     android:textColorHint="@color/app_TextColor"
     app:layout_constraintEnd_toEndOf="parent"
@@ -126,12 +126,13 @@
       tools:ignore="SpeakableTextPresentCheck" />
   </com.google.android.material.textfield.TextInputLayout>
 
+
   <com.google.android.material.textfield.TextInputLayout
     android:id="@+id/add_toilet_postcode"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="100dp"
-    android:layout_marginTop="25dp"
+    android:layout_marginTop="15dp"
     android:layout_marginEnd="100dp"
     android:textColorHint="@color/app_TextColor"
     app:layout_constraintEnd_toEndOf="parent"
@@ -144,7 +145,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:drawablePadding="5dp"
-      android:hint="@string/add_toilet_district"
+      android:hint="@string/add_toilet_postcode"
       android:importantForAutofill="no"
       android:inputType="text"
       android:textColor="@color/app_TextColor"
@@ -157,13 +158,13 @@
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="100dp"
-    android:layout_marginTop="25dp"
+    android:layout_marginTop="15dp"
     android:layout_marginEnd="100dp"
     android:textColorHint="@color/app_TextColor"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintHorizontal_bias="0.0"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/add_toilet_district">
+    app:layout_constraintTop_toBottomOf="@+id/add_toilet_postcode">
 
     <EditText
       android:id="@+id/add_toilet_edittext_doelgroep"
@@ -230,14 +231,27 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/add_toilet_integraal_toegankelijk" />
 
+  <CheckBox
+    android:id="@+id/add_toilet_betalend"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="100dp"
+    android:layout_marginTop="0dp"
+    android:layout_marginEnd="100dp"
+    android:onClick="onCheckboxClicked"
+    android:text="@string/add_toilet_luiertafel"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/add_toilet_luiertafel" />
+
   <Button
-    android:id="@+id/login_button"
+    android:id="@+id/add_toilet_button"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="100dp"
     android:layout_marginEnd="100dp"
     android:background="@color/app_Orange"
-    android:text="@string/add_toilet_string"
+    android:text="@string/add_toilet_betalend"
     android:textAlignment="center"
     android:textColor="@color/app_Background"
     app:layout_constraintBottom_toBottomOf="parent"
@@ -245,7 +259,7 @@
     app:layout_constraintHorizontal_bias="0.0"
     app:layout_constraintStart_toStartOf="parent"
     android:layout_marginTop="0dp"
-    app:layout_constraintTop_toBottomOf="@+id/add_toilet_luiertafel"
+    app:layout_constraintTop_toBottomOf="@+id/add_toilet_betalend"
     app:layout_constraintVertical_bias="0.292"
     tools:ignore="TextContrastCheck" />
 </androidx.constraintlayout.widget.ConstraintLayout>
